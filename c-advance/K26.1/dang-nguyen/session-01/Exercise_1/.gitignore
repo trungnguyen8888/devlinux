@@ -1,0 +1,6 @@
+# Build output folders
+build/
+lib/
+
+# Local static analysis script
+static_analysis.sh
