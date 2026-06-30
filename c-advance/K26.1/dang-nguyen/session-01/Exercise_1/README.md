@@ -2,18 +2,32 @@
 
 ```bash
 <current directory>
-├── include                       --- Headers
+├── include                                     --- Headers
 │   ├── ipv4_parser.h
 │   └── ipv4_types.h
-├── src                           --- Library source files
+├── src                                         --- Library source files
 │   └── ipv4_parser.c
-├── test                          --- Test files
-│   └── integration_test          --- Integration test for the library
-│           ├── main.c            --- Main test file
-│           └── Makefile          --- Makefile for building the integration test
-├── Makefile                      --- Makefile for building the library
-└── README.md                     --- This file
+├── test                                        --- Test files
+│   ├── integration_test                        --- Integration test for the library
+│   │       ├── main.c                          --- Main integration test file
+│   │       └── Makefile                        --- Makefile for building the integration test
+│   └── unit_test                               --- Unit test for the library   
+│       ├── convert_octet.c
+│       ├── include
+│       │   ├── convert_octet.h
+│       │   ├── ipv4_parser_test_private.h
+│       │   ├── move_to_next_octet.h
+│       │   ├── ut_common.h
+│       │   └── validate_ip_boundary.h
+│       ├── main.c                              --- Main unit test file
+│       ├── Makefile                            --- Makefile for building the unit test
+│       ├── move_to_next_octet.c
+│       ├── ut_common.c
+│       └── validate_ip_boundary.c
+├── Makefile                                    --- Makefile for building the library
+└── README.md                                   --- This file
 ```
+
 # 2. Library Overview
 
 Description of the library, its purpose, and how it can be used.
@@ -42,7 +56,43 @@ make clean
 
 To use the library in your project, include the header files from the *<current directory>/include/* directory and link against the `libipv4_parser.a` library file.
 
-# 3. Test Overview
+# 3. Unit Test Overview
+
+## 3.1 How to build the unit test
+
+To build the unit test, navigate to the *<current directory>/test/unit_test/* directory and run the following command:
+
+```bash
+make all
+```
+
+The unit test will be built and the output file `unit_test` will be placed in the *<current directory>/build/*. If the library is not built yet, the Makefile will automatically build the library before building the unit test.
+
+## 3.2 How to remove the unit test
+
+To remove the unit test from the *<current directory>/build/* directory, run the following command in the *<current directory>/test/unit_test/* directory:
+
+```bash
+make clean
+```
+
+The Makefile will remove *<current directory>/build/* and also remove the *<current directory>/lib/* directory if it was built as part of the unit test build process.
+
+# 3.3 How to run the unit test
+
+To run the unit test, navigate to the *<current directory>/build/* directory and execute the following command:
+
+```bash
+./unit_test
+```
+
+Or you can go in the *<current directory>/test/unit_test/* directory and run the following command:
+
+```bash
+make run
+```
+
+# 3. Integration Test Overview
 
 ## 3.1 How to build the integration test
 
@@ -69,7 +119,13 @@ The Makefile will remove *<current directory>/build/* and also remove the *<curr
 To run the integration test, navigate to the *<current directory>/build/* directory and execute the following command:
 
 ```bash
-./integration_test <IPv4 address>
+./integration_test
+```
+
+Or you can go in the *<current directory>/test/integration_test/* directory and run the following command:
+
+```bash
+make run
 ```
 
 # 4. Static Analysis
