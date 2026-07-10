@@ -9,7 +9,7 @@ OBJ_DIR = $(BUILD_DIR)/obj
 SERVER_SRC_DIR = src/server
 CLIENT_SRC_DIR = src/client
 
-SERVER_SRCS = $(SERVER_SRC_DIR)/main.c $(SERVER_SRC_DIR)/auth.c $(SERVER_SRC_DIR)/broadcast.c $(SERVER_SRC_DIR)/history.c $(SERVER_SRC_DIR)/users.c
+SERVER_SRCS = $(SERVER_SRC_DIR)/main.c $(SERVER_SRC_DIR)/auth.c $(SERVER_SRC_DIR)/broadcast.c $(SERVER_SRC_DIR)/history.c $(SERVER_SRC_DIR)/users.c $(SERVER_SRC_DIR)/status.c
 CLIENT_SRCS = $(CLIENT_SRC_DIR)/main.c
 
 SERVER_OBJS = $(patsubst $(SERVER_SRC_DIR)/%.c,$(OBJ_DIR)/server_%.o,$(SERVER_SRCS))

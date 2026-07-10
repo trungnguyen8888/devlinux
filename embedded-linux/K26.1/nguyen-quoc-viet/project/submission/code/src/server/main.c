@@ -29,6 +29,7 @@ extern int register_user(const char *username, const char *password);
 extern void broadcast_message(const char *username, const char *text);
 extern void send_message_history(int client_fd, const char *username);
 extern void send_all_users_list(int client_fd);
+extern void print_user_status(void);
 
 void signal_handler(int sig)
 {
@@ -53,6 +54,10 @@ void close_client(client_t *client)
 	if (client->fd < 0)
 		return;
 
+	int was_authenticated = client->authenticated;
+	char username[64];
+	strcpy(username, client->username);
+
 	close(client->fd);
 
 	pthread_mutex_lock(&clients_mutex);
@@ -61,6 +66,11 @@ void close_client(client_t *client)
 	client->fd = -1;
 	client->authenticated = 0;
 	pthread_mutex_unlock(&clients_mutex);
+
+	if (was_authenticated) {
+		printf("[-] %s logged out\n", username);
+		print_user_status();
+	}
 }
 
 void route_message(client_t *client, const char *message);
@@ -121,6 +131,8 @@ void handle_login(client_t *client, const char *credentials)
 		pthread_mutex_lock(&clients_mutex);
 		client_count++;
 		pthread_mutex_unlock(&clients_mutex);
+		printf("[+] %s logged in\n", username);
+		print_user_status();
 		send_message(client->fd, "OK:LOGIN\n");
 		send_message_history(client->fd, username);
 	} else {
@@ -152,6 +164,8 @@ void handle_register(client_t *client, const char *credentials)
 		pthread_mutex_lock(&clients_mutex);
 		client_count++;
 		pthread_mutex_unlock(&clients_mutex);
+		printf("[+] %s registered and logged in\n", username);
+		print_user_status();
 		send_message(client->fd, "OK:REGISTER\n");
 		send_message_history(client->fd, username);
 	} else {
