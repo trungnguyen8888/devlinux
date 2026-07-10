@@ -38,13 +38,15 @@ void print_user_status(void)
 		if (sscanf(line, "%63[^:]:%64[^:]", username, hash) == 2) {
 			pthread_mutex_lock(&clients_mutex);
 
-			char status[12] = "offline";
+			char status_color[32] = "\x1b[31m";
+			char status_text[12] = "✗ offline";
 			char ip_info[128] = "";
 
 			for (int i = 0; i < MAX_CLIENTS; i++) {
 				if (clients[i].fd >= 0 && clients[i].authenticated &&
 				    strcmp(clients[i].username, username) == 0) {
-					snprintf(status, sizeof(status), "online");
+					snprintf(status_color, sizeof(status_color), "\x1b[32m");
+					snprintf(status_text, sizeof(status_text), "✓ online");
 					char ip_str[INET_ADDRSTRLEN];
 					inet_ntop(AF_INET, &clients[i].addr.sin_addr, ip_str, INET_ADDRSTRLEN);
 					snprintf(ip_info, sizeof(ip_info), "| %s:%d", ip_str,
@@ -55,7 +57,7 @@ void print_user_status(void)
 
 			pthread_mutex_unlock(&clients_mutex);
 
-			printf("%-12s| %-9s%s\n", username, status, ip_info);
+			printf("%-12s| %s%-13s\x1b[0m%s\n", username, status_color, status_text, ip_info);
 		}
 	}
 
