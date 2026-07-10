@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99 -Iinc
-LDFLAGS = -lcrypto
+LDFLAGS = -lcrypto -lpthread
 
 INC_DIR = inc
 BUILD_DIR = build

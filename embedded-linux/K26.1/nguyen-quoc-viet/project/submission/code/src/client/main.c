@@ -21,6 +21,7 @@ volatile int running = 1;
 
 void signal_handler(int sig)
 {
+	(void)sig;
 	running = 0;
 }
 
@@ -70,7 +71,6 @@ int connect_to_server(void)
 		return -1;
 	}
 
-	fcntl(sock, F_SETFL, O_NONBLOCK);
 	return sock;
 }
 
@@ -158,8 +158,6 @@ void chat_loop(int sock, const char *username)
 {
 	char send_buf[BUFFER_SIZE];
 	char recv_buf[BUFFER_SIZE];
-	char line_buf[BUFFER_SIZE];
-	int line_pos = 0;
 	int recv_len;
 	fd_set readfds;
 
@@ -203,11 +201,6 @@ void chat_loop(int sock, const char *username)
 				display_message(pos);
 				pos = newline + 1;
 			}
-
-			if (strlen(pos) > 0) {
-				strcpy(line_buf, pos);
-				line_pos = strlen(pos);
-			}
 		}
 
 		if (FD_ISSET(STDIN_FILENO, &readfds)) {
@@ -234,7 +227,9 @@ void chat_loop(int sock, const char *username)
 				} else if (strncmp(trimmed, "/help", 5) == 0) {
 					show_help();
 				} else {
-					snprintf(send_buf, sizeof(send_buf), "MSG:%s\n", trimmed);
+					int maxlen = (int)sizeof(send_buf) - 6;
+					snprintf(send_buf, sizeof(send_buf), "MSG:%.*s\n",
+						maxlen > 0 ? maxlen : 0, trimmed);
 					send(sock, send_buf, strlen(send_buf), 0);
 				}
 
@@ -249,7 +244,7 @@ void chat_loop(int sock, const char *username)
 				printf("\b \b");
 				fflush(stdout);
 			} else if (ch >= 32 && ch < 127) {
-				int len = strlen(send_buf);
+				size_t len = strlen(send_buf);
 				if (len < sizeof(send_buf) - 1) {
 					send_buf[len] = ch;
 					send_buf[len + 1] = '\0';
@@ -300,6 +295,7 @@ int main(int argc, char *argv[])
 		handle_login(sock, username, password);
 	}
 
+	fcntl(sock, F_SETFL, O_NONBLOCK);
 	chat_loop(sock, username);
 
 	close(sock);

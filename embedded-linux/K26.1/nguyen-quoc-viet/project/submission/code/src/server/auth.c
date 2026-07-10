@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,6 +7,7 @@
 #include <fcntl.h>
 #include <sys/file.h>
 #include <unistd.h>
+#include <sys/types.h>
 
 #define ACCOUNTS_FILE "accounts.db"
 #define MAX_USERNAME 64
@@ -54,7 +56,7 @@ int authenticate_user(const char *username, const char *password)
 	while (fgets(line, sizeof(line), fp)) {
 		line[strcspn(line, "\n")] = 0;
 
-		if (sscanf(line, "%63[^:]:%64s", stored_user, stored_hash) == 2) {
+		if (sscanf(line, "%63[^:]:%64[^:]", stored_user, stored_hash) == 2) {
 			if (strcmp(username, stored_user) == 0) {
 				if (strcmp(input_hash, stored_hash) == 0)
 					found = 1;

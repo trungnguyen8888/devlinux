@@ -1,29 +1,15 @@
+#define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
 #include <sys/file.h>
+#include <sys/socket.h>
 #include <time.h>
 #include <unistd.h>
 
 #define MESSAGES_LOG "messages.log"
 #define MAX_MESSAGE 256
-#define MAX_CLIENTS 100
-
-typedef struct {
-	int fd;
-	char username[64];
-	int authenticated;
-	char input_buffer[4096];
-	int input_len;
-	char output_buffer[4096];
-	int output_len;
-	int output_pos;
-} client_t;
-
-extern client_t clients[MAX_CLIENTS];
-
-void send_message(client_t *client, const char *text);
 
 void save_message_log(const char *username, const char *text)
 {
@@ -50,18 +36,8 @@ void send_message_history(int client_fd, const char *username)
 	char user[64];
 	long timestamp;
 	char message[MAX_MESSAGE];
-	int i;
-	client_t *client = NULL;
 
-	for (i = 0; i < MAX_CLIENTS; i++) {
-		if (clients[i].fd == client_fd) {
-			client = &clients[i];
-			break;
-		}
-	}
-
-	if (!client)
-		return;
+	(void)username;
 
 	fp = fopen(MESSAGES_LOG, "r");
 	if (!fp)
@@ -75,7 +51,7 @@ void send_message_history(int client_fd, const char *username)
 		if (sscanf(line, "%63[^:]:%ld:%255[^\n]", user, &timestamp, message) == 3) {
 			char buf[512];
 			snprintf(buf, sizeof(buf), "HISTORY:%s:%s\n", user, message);
-			send_message(client, buf);
+			send(client_fd, buf, strlen(buf), 0);
 		}
 	}
 
