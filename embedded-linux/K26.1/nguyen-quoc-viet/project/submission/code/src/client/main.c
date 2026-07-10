@@ -10,6 +10,7 @@
 #include <signal.h>
 #include <sys/select.h>
 #include <sys/types.h>
+#include "colors.h"
 
 #define SERVER_HOST "127.0.0.1"
 #define SERVER_PORT 5000
@@ -28,21 +29,24 @@ void signal_handler(int sig)
 void show_banner(void)
 {
 	printf("\n");
+	printf(COLOR_BRIGHT_CYAN);
 	printf("╔═══════════════════════════════════════╗\n");
-	printf("║     DevLinux Chat Client v1.0         ║\n");
+	printf("║" COLOR_BOLD "   💬 DevLinux Chat Client v1.0   " COLOR_RESET COLOR_BRIGHT_CYAN "║\n");
 	printf("╚═══════════════════════════════════════╝\n");
-	printf("Server: %s:%d\n\n", SERVER_HOST, SERVER_PORT);
+	printf(COLOR_RESET);
+	printf(COLOR_CYAN "🌐 Server: %s:%d" COLOR_RESET "\n\n", SERVER_HOST, SERVER_PORT);
 }
 
 void show_help(void)
 {
-	printf("\n┌─ Available Commands ─────────────────────────────┐\n");
-	printf("│ /who              - List online users            │\n");
-	printf("│ /all-users        - List all registered users    │\n");
-	printf("│ /help             - Show this help               │\n");
-	printf("│ /quit             - Exit chat                    │\n");
-	printf("│ (other text)      - Send message to all users    │\n");
-	printf("└──────────────────────────────────────────────────┘\n");
+	printf("\n" COLOR_BRIGHT_BLUE "╭─ Available Commands " COLOR_RESET "\n");
+	printf(COLOR_BRIGHT_BLUE "│\n");
+	printf(COLOR_BRIGHT_BLUE "│ " COLOR_GREEN "/who" COLOR_RESET "              → " "List online users\n");
+	printf(COLOR_BRIGHT_BLUE "│ " COLOR_GREEN "/all-users" COLOR_RESET "        → " "List all registered users\n");
+	printf(COLOR_BRIGHT_BLUE "│ " COLOR_GREEN "/help" COLOR_RESET "             → " "Show this help\n");
+	printf(COLOR_BRIGHT_BLUE "│ " COLOR_GREEN "/quit" COLOR_RESET "             → " "Exit chat\n");
+	printf(COLOR_BRIGHT_BLUE "│ " COLOR_YELLOW "message text" COLOR_RESET "     → " "Send message to all users\n");
+	printf(COLOR_BRIGHT_BLUE "╰" COLOR_RESET "\n\n");
 }
 
 int connect_to_server(void)
@@ -88,12 +92,12 @@ int handle_login(int sock, char *username, char *password)
 	if (len > 0) {
 		buf[len] = '\0';
 		if (strncmp(buf, "OK:LOGIN", 8) == 0) {
-			printf("[✓] Login successful!\n\n");
+			printf(COLOR_GREEN "✅ Login successful!" COLOR_RESET "\n\n");
 			return 1;
 		}
 	}
 
-	printf("[!] Login failed: Invalid username or password.\n");
+	printf(COLOR_RED "❌ Login failed: Invalid username or password." COLOR_RESET "\n");
 	return 0;
 }
 
@@ -118,13 +122,13 @@ int handle_register(int sock, char *username, char *password)
 		if (len > 0) {
 			buf[len] = '\0';
 			if (strncmp(buf, "OK:REGISTER", 11) == 0) {
-				printf("[✓] Registration successful!\n\n");
+				printf(COLOR_GREEN "✅ Registration successful!" COLOR_RESET "\n\n");
 				return 1;
 			}
 		}
 	}
 
-	printf("[!] Registration failed: Username may already exist or server error.\n");
+	printf(COLOR_RED "❌ Registration failed: Username may already exist or server error." COLOR_RESET "\n");
 	return 0;
 }
 
@@ -135,28 +139,28 @@ void display_message(const char *line)
 		if (colon) {
 			char user[64];
 			sscanf(line, "HISTORY:%63[^:]", user);
-			printf("[history] %s: %s\n", user, colon + 1);
+			printf(COLOR_BRIGHT_BLACK "📜 [%s]: " COLOR_RESET "%s\n", user, colon + 1);
 		}
 	} else if (strncmp(line, "FROM:", 5) == 0) {
 		char *colon = strchr(line + 5, ':');
 		if (colon) {
 			char user[64];
 			sscanf(line, "FROM:%63[^:]", user);
-			printf("[%s] %s: %s\n", user, user, colon + 1);
+			printf(COLOR_BRIGHT_GREEN "💬 %s:" COLOR_RESET " %s\n", user, colon + 1);
 		}
 	} else if (strncmp(line, "USERS:", 6) == 0) {
-		printf("[users] Online: %s\n", line + 6);
+		printf(COLOR_BRIGHT_YELLOW "👥 Online Users:" COLOR_RESET " %s\n", line + 6);
 	} else if (strncmp(line, "ALLUSERS:", 9) == 0) {
-		printf("\n[📋 Registered Users]\n");
-		printf("─────────────────────────────────────────\n");
+		printf("\n" COLOR_BRIGHT_CYAN "📋 Registered Users" COLOR_RESET "\n");
+		printf(COLOR_BRIGHT_CYAN "─────────────────────────────────────────" COLOR_RESET "\n");
 	} else if (strncmp(line, "ALLUSERS:", 9) != 0 && strlen(line) > 0 && line[0] != '[' && strchr(line, '|')) {
-		printf("%s\n", line);
+		printf(COLOR_DIM "  %s" COLOR_RESET "\n", line);
 	} else if (strncmp(line, "ERR:", 4) == 0) {
-		printf("[!] Server error: %s\n", line + 4);
+		printf(COLOR_RED "❌ Error: %s" COLOR_RESET "\n", line + 4);
 	} else if (strncmp(line, "OK:", 3) == 0) {
-		printf("[✓] %s\n", line + 3);
+		printf(COLOR_GREEN "✅ %s" COLOR_RESET "\n", line + 3);
 	} else {
-		printf("[server] %s\n", line);
+		printf(COLOR_BRIGHT_BLACK "🔔 %s" COLOR_RESET "\n", line);
 	}
 }
 
@@ -167,9 +171,9 @@ void chat_loop(int sock, const char *username)
 	int recv_len;
 	fd_set readfds;
 
-	printf("[Connected as %s]\n", username);
+	printf(COLOR_BRIGHT_GREEN "✨ Connected as " COLOR_BOLD "%s" COLOR_RESET COLOR_BRIGHT_GREEN " ✨" COLOR_RESET "\n", username);
 	show_help();
-	printf("\n> ");
+	printf("\n" COLOR_BRIGHT_BLUE "❯" COLOR_RESET " ");
 	fflush(stdout);
 
 	while (running) {
@@ -210,7 +214,7 @@ void chat_loop(int sock, const char *username)
 				pos = newline + 1;
 			}
 
-			printf("> ");
+			printf(COLOR_BRIGHT_BLUE "❯" COLOR_RESET " ");
 			fflush(stdout);
 		}
 
@@ -222,7 +226,7 @@ void chat_loop(int sock, const char *username)
 			input_line[strcspn(input_line, "\n")] = '\0';
 
 			if (strlen(input_line) == 0) {
-				printf("> ");
+				printf(COLOR_BRIGHT_BLUE "❯" COLOR_RESET " ");
 				fflush(stdout);
 				continue;
 			}
@@ -243,7 +247,7 @@ void chat_loop(int sock, const char *username)
 				send(sock, buf, strlen(buf), 0);
 			} else if (strncmp(input_line, "/help", 5) == 0) {
 				show_help();
-				printf("> ");
+				printf(COLOR_BRIGHT_BLUE "❯" COLOR_RESET " ");
 				fflush(stdout);
 				continue;
 			} else {
@@ -254,7 +258,7 @@ void chat_loop(int sock, const char *username)
 				send(sock, buf, strlen(buf), 0);
 			}
 
-			printf("> ");
+			printf(COLOR_BRIGHT_BLUE "❯" COLOR_RESET " ");
 			fflush(stdout);
 		}
 	}
