@@ -1,9 +1,6 @@
 {
   "projects": {
-    "student-name-1": "P1",
-    "student-name-2": "P2",
-    "student-name-3": "P3",
-    "student-name-4": "P4"
+    "nguyen-quoc-viet": "P3"
   },
-  "reviewers": ["teacher-1", "teacher-2"]
+  "reviewers": ["quocviet1026"]
 }
