@@ -1,5 +1,11 @@
 # Assignment — Session 05: UART
-**Deadline: 2026-07-31 23:59:00**
+**Deadline: 2026-06-14 23:59:00**
+
+---
+
+> ⚠️ **YÊU CẦU QUAN TRỌNG (áp dụng cho TẤT CẢ exercise trong file này):**
+> **BẮT BUỘC phải sử dụng ESP-IDF** (`driver/uart.h`, `uart_driver_install()`, `uart_param_config()`, `uart_set_pin()`, FreeRTOS task/queue của ESP-IDF).
+> **CẤM tuyệt đối sử dụng code kiểu Arduino** — không `#include <Arduino.h>`, không dùng `Serial.begin()`, `Serial.print()`, `Serial.available()`, `Serial.read()`, không dùng thư viện Arduino cho `led_strip`/NeoPixel kiểu Arduino, không dùng Arduino-ESP32 core, không build bằng `arduino-cli`/Arduino IDE. Bài nộp dùng Arduino API sẽ bị coi là **không đạt yêu cầu**, dù chức năng có đúng.
 
 ---
 

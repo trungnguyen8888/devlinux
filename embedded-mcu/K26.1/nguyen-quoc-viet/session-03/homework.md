@@ -1,5 +1,11 @@
 # Assignment — Session 03: Register-Level vs Driver API Programming
-**Deadline: 2026-07-31 23:59:00**
+**Deadline: 2026-06-07 23:59:00**
+
+---
+
+> ⚠️ **YÊU CẦU QUAN TRỌNG (áp dụng cho TẤT CẢ exercise trong file này):**
+> **BẮT BUỘC phải sử dụng ESP-IDF** (register-level access qua `esp_attr.h`/thanh ghi trực tiếp như mô tả, hoặc Driver API của ESP-IDF khi được yêu cầu).
+> **CẤM tuyệt đối sử dụng code kiểu Arduino** — không `#include <Arduino.h>`, không dùng các hàm/API của Arduino framework (`pinMode()`, `digitalWrite()`, `digitalRead()`, `Serial.print()`, `delay()`, `analogRead()`, v.v.), không dùng Arduino-ESP32 core, không build bằng `arduino-cli`/Arduino IDE. Bài nộp dùng Arduino API sẽ bị coi là **không đạt yêu cầu**, dù chức năng có đúng.
 
 ---
 

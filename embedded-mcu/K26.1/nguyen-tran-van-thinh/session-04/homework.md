@@ -1,5 +1,11 @@
 # Assignment — Session 04: Polling and Interrupt
-**Deadline: 2026-07-31 23:59:00**
+**Deadline: 2026-06-07 23:59:00**
+
+---
+
+> ⚠️ **YÊU CẦU QUAN TRỌNG (áp dụng cho TẤT CẢ exercise trong file này):**
+> **BẮT BUỘC phải sử dụng ESP-IDF** (Driver API — `driver/gpio.h`, `gpio_config()`, `gpio_install_isr_service()`, `gpio_isr_handler_add()` — kết hợp với register-level cho LED như đã làm ở Session 03).
+> **CẤM tuyệt đối sử dụng code kiểu Arduino** — không `#include <Arduino.h>`, không dùng `attachInterrupt()`, `pinMode()`, `digitalWrite()`, `digitalRead()`, `Serial.print()`, `delay()`, không dùng Arduino-ESP32 core, không build bằng `arduino-cli`/Arduino IDE. Bài nộp dùng Arduino API sẽ bị coi là **không đạt yêu cầu**, dù chức năng có đúng.
 
 ---
 

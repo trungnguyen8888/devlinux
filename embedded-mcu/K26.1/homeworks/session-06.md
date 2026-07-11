@@ -1,5 +1,11 @@
 # Assignment — Session 06: I2C
-**Deadline: 2026-07-31 23:59:00**
+**Deadline: 2026-06-14 23:59:00**
+
+---
+
+> ⚠️ **YÊU CẦU QUAN TRỌNG (áp dụng cho TẤT CẢ exercise trong file này):**
+> **BẮT BUỘC phải sử dụng ESP-IDF** (`driver/i2c_master.h` cho I2C, ESP-IDF component registry qua `idf.py add-dependency` nếu dùng driver SSD1306 có sẵn).
+> **CẤM tuyệt đối sử dụng code kiểu Arduino** — không `#include <Arduino.h>`, không dùng `Wire.h`/`Wire.begin()`/`Wire.write()`/`Wire.read()`, không dùng các thư viện Arduino cho DHT11/DHT20 (ví dụ `DHT.h`, `Adafruit_DHT`) hoặc SSD1306 kiểu Arduino (ví dụ `Adafruit_SSD1306`, `U8g2` bản Arduino), không dùng Arduino-ESP32 core, không build bằng `arduino-cli`/Arduino IDE. Bài nộp dùng Arduino API/thư viện Arduino sẽ bị coi là **không đạt yêu cầu**, dù chức năng có đúng.
 
 ---
 
