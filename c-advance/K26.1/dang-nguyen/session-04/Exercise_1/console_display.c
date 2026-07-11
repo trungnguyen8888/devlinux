@@ -2,49 +2,47 @@
 #include <string.h>
 #include "console_display.h"
 
-struct st_display_config
+typedef struct st_display_config
 {
-    uint16_t baud_rate;
-};
+    uint32_t baud_rate;
+} st_display_config_t;
 
-static void console_display_init(st_display_config_t *p_config);
-static void console_display_draw_pixel(uint16_t x, uint16_t y, uint8_t colour);
+static e_errcode_t console_display_init(const display_config_handle_t p_cfg_hdl);
+static void console_display_draw_pixel(const uint16_t x, const uint16_t y, const uint8_t colour);
 
-st_i_display_t console_display = {
+/**
+ * @brief Console display interface instance.
+ * Implements polymorphic display driver for terminal output.
+ */
+const st_i_display_t console_display = {
     .init       = &console_display_init,
     .draw_pixel = &console_display_draw_pixel
 };
 
-static void console_display_init(st_display_config_t *p_config)
+static e_errcode_t console_display_init(const display_config_handle_t p_cfg_hdl)
 {
-    if (NULL == p_config)
+    st_display_config_t *p_dpl_cfg = (st_display_config_t *)p_cfg_hdl;
+    e_errcode_t         ret        = DL_RET_OK;
+
+    if (NULL == p_dpl_cfg)
     {
         printf("[%s]: Invalid p_config\n", __func__);
+        ret = DL_RET_INVALID_PARAM;
     }
+
+    return ret;
 }
 
-static void console_display_draw_pixel(uint16_t x, uint16_t y, uint8_t colour)
+static void console_display_draw_pixel(const uint16_t x, const uint16_t y, const uint8_t colour)
 {
     printf("[Console] Drawing pixel at (%u, %u) with color %u\n", x, y, colour);
 }
 
-st_display_config_t *console_config_create(uint32_t baud_rate)
+display_config_handle_t console_config_create(const uint32_t baud_rate)
 {
-    st_display_config_t *p_dpl_cfg = (st_display_config_t *)malloc(sizeof(st_display_config_t));
+    static st_display_config_t dpl_cfg = {0};
 
-    if (NULL != p_dpl_cfg)
-    {
-        (void)memset(p_dpl_cfg, 0, sizeof(st_display_config_t));
-        p_dpl_cfg->baud_rate = baud_rate;
-    }
-
-    return p_dpl_cfg;
-}
-
-void console_config_destroy(st_display_config_t *p_dlp_cfg)
-{
-    if (NULL != p_dlp_cfg)
-    {
-        free(p_dlp_cfg);
-    }
+    dpl_cfg.baud_rate = baud_rate;
+    
+    return (display_config_handle_t)&dpl_cfg;
 }

@@ -3,8 +3,16 @@
 
 #include "i_display.h"
 
-uint32_t get_draw_count();
+/**
+ * @brief Get the number of dummy display draw operations.
+ * 
+ * Returns the number of times dummy_display_draw_pixel() has been called
+ * since the dummy display was initialized.
+ * 
+ * @return Number of draw operations performed by the dummy display.
+ */
+uint32_t get_draw_count(void);
 
-extern st_i_display_t dummy_display;
+extern const st_i_display_t dummy_display;
 
 #endif

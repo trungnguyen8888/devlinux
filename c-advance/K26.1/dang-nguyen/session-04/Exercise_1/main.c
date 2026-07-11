@@ -14,11 +14,32 @@ typedef struct st_pixel_info
     uint8_t  colour;
 } st_pixel_info_t;
 
-static int32_t draw_rectangle(st_i_display_t *p_disp);
+typedef enum e_display_type
+{
+    CONSOLE = 0U,
+    DUMMY,
+    TYPE_COUNT
+} e_display_type_t;
 
-st_display_config_t *p_display_config;
+static int32_t draw_rectangle(
+    const st_i_display_t    *const p_disp
+);
 
-static int32_t draw_rectangle(st_i_display_t *p_disp)
+static int32_t process(
+    const st_i_display_t            *const p_type,
+    const e_display_type_t          type_id,
+    const display_config_handle_t   p_hdl
+);
+
+static const char *p_type_name[TYPE_COUNT] =
+{
+    [CONSOLE] = "Console",
+    [DUMMY]   = "Dummy"
+};
+
+static int32_t draw_rectangle(
+    const st_i_display_t    *const p_disp
+)
 {
     static st_pixel_info_t pixel_info[PIXEL_NUM] =
     {
@@ -50,44 +71,63 @@ static int32_t draw_rectangle(st_i_display_t *p_disp)
     return ret;
 }
 
-int32_t main(void)
+static int32_t process(
+    const st_i_display_t            *const p_type,
+    const e_display_type_t          type_id,
+    const display_config_handle_t   p_hdl
+)
 {
     int32_t ret = APP_SUCCESS;
+    e_errcode_t api_ret = DL_RET_OK;
 
-    if (NULL == console_display.init)
+    if (TYPE_COUNT <= type_id)
     {
-        printf("console_display.init() is not set!\n");
+        printf("[%s]: Invalid display type!\n", __func__);
         ret = APP_FAILURE;
     }
-    else if (NULL == dummy_display.init)
+    else if (NULL == p_type)
     {
-        printf("dummy_display.init() is not set!\n");
+        printf("[%s]: p_type is NULL!\n", __func__);
+        ret = APP_FAILURE;
+    }
+    else if (NULL == p_type->init)
+    {
+        printf("[%s]: %s's Init( ) is not set!\n", __func__, p_type_name[type_id]);
         ret = APP_FAILURE;
     }
     else
     {
-        p_display_config = console_config_create(BAUD_RATE);
+        api_ret = p_type->init(p_hdl);
+    }
 
-        if (NULL != p_display_config)
+    if (APP_SUCCESS == ret)
+    {
+        if (DL_RET_OK == api_ret)
         {
-            console_display.init(p_display_config);
-            ret = draw_rectangle(&console_display);
-        
-            if (APP_SUCCESS == ret)
-            {
-                dummy_display.init(p_display_config);
-                ret = draw_rectangle(&dummy_display);
-                printf("Dummy display was called %u times.\n", get_draw_count());
-            }
-        
-            console_config_destroy(p_display_config);
-            p_display_config = NULL;
+            ret = draw_rectangle(p_type);
         }
         else
         {
-            printf("Failed to allocate display_config!\n");
             ret = APP_FAILURE;
         }
+    }
+
+    return ret;
+}
+
+int32_t main(void)
+{
+    display_config_handle_t p_dpl_handle = NULL;
+    int32_t ret = APP_SUCCESS;
+
+    p_dpl_handle = console_config_create(BAUD_RATE);
+
+    ret = process(&console_display, CONSOLE, p_dpl_handle);
+
+    if (APP_SUCCESS == ret)
+    {
+        ret = process(&dummy_display, DUMMY, p_dpl_handle);
+        printf("Dummy display was called %u times.\n", get_draw_count());
     }
 
     return ret;

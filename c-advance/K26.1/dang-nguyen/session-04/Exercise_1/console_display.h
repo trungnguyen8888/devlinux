@@ -3,9 +3,17 @@
 
 #include "i_display.h"
 
-st_display_config_t *console_config_create(uint32_t baud_rate);
-void console_config_destroy(st_display_config_t *p_dlp_cfg);
+/**
+ * @brief Create and return opaque handle to console display configuration.
+ * 
+ * Initializes static storage with specified baud_rate.
+ * The returned pointer is valid for the entire program lifetime.
+ * 
+ * @param[in] baud_rate UART baud rate configuration.
+ * @return Opaque handle to configuration (never NULL).
+ */
+display_config_handle_t console_config_create(uint32_t baud_rate);
 
-extern st_i_display_t console_display;
+extern const st_i_display_t console_display;
 
 #endif
