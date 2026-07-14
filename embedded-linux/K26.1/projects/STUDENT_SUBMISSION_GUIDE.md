@@ -6,33 +6,35 @@
 
 ## Overview — 2-Gate Review Là Gì?
 
-Mỗi project cuối khoá phải qua **2 cổng review tuần tự**:
+Mỗi project cuối khoá phải qua **2 cổng review độc lập**:
 
 ```
-┌─────────────────────────┐
-│  Gate 1: DESIGN REVIEW  │
-│  (Tuần 1-2)             │
-│  Claude review design   │
-│  Teacher approve design │
-│  → PASS ✅              │
-└────────────┬────────────┘
+┌──────────────────────────┐
+│  Gate 1: DESIGN REVIEW   │
+│  (Tuần 1-2)              │
+│  Branch: .../design      │
+│  Claude review design    │
+│  Teacher bảo sửa → ≥80   │
+│  → Approved ✅           │
+└────────────┬─────────────┘
              │
-             ↓ Design merged to master + SCORE.json locked
+             ↓ Student creates code branch from design
              │
-┌─────────────────────────┐
-│  Gate 2: PROJECT REVIEW │
-│  (Tuần 3-8)             │
-│  Claude review code     │
-│  Teacher review tests   │
-│  Teacher approve code   │
-│  → PASS ✅              │
-└─────────────────────────┘
+┌──────────────────────────┐
+│  Gate 2: CODE REVIEW     │
+│  (Tuần 3-8)              │
+│  Branch: .../code        │
+│  (từ design branch)      │
+│  Claude review code      │
+│  Teacher review tests    │
+│  → PASS ✅               │
+└──────────────────────────┘
 ```
 
 ### Điều kiện bắt buộc:
-- ✅ **Phải pass Gate 1 trước khi nộp Gate 2** (design được merge vào master)
-- ✅ Gate 1 phải đạt **score ≥ 60** để được phép code
-- ✅ Gate 2 là final review của code + test results
+- ✅ **Phải đạt design ≥80 điểm** (do teacher phê duyệt) trước khi code
+- ✅ **Code branch được tạo TỪ design branch** (chứa DESIGN.md context)
+- ✅ Gate 2 là final review của code + test results (độc lập, không check design score)
 
 ---
 
@@ -82,9 +84,9 @@ Xem `P{N}_DESIGN_TEMPLATE.md` để biết template chính xác. Tối thiểu p
 
 | Score | Verdict | Được code? | Hành động |
 |-------|---------|-----------|-----------|
-| **≥80** | **PASS** | ✅ **CÓ** | Merge ngay → sync fork → code |
-| **60-79** | **PASS_WITH_REVISIONS** | ✅ **CÓ** | Merge → code song song với fix design |
-| **<60** | **FAIL** | ❌ **KHÔNG** | Không merge → viết lại design từ đầu |
+| **≥80** | **PASS** | ✅ **CÓ** | Teacher phê duyệt → Bắt đầu code |
+| **60-79** | **PASS_WITH_REVISIONS** | ⏳ **CHỜ** | Sửa design cho đến ≥80 → Teacher phê duyệt |
+| **<60** | **FAIL** | ❌ **KHÔNG** | Viết lại design → nộp lại |
 
 ### Nếu bị Request Changes:
 
@@ -102,32 +104,20 @@ Xem `P{N}_DESIGN_TEMPLATE.md` để biết template chính xác. Tối thiểu p
    - Post comment mới với score mới
 5. **Lặp lại cho đến khi score ≥60** → teacher approve → merge
 
-### Check design merged hay chưa:
-
-```bash
-# Trên local, sau khi sync fork
-git pull origin master
-
-# Check xem SCORE.json có không
-cat embedded-linux/K27.1/nguyen-van-a/project/submission/design/SCORE.json
-```
-
-- **Tồn tại + score ≥60 + approved_by có reviewer:** ✅ Được code
-- **Không tồn tại hoặc score <60:** ❌ Design chưa pass
-
 ---
 
-## Gate 2: Project Review (Tuần 3-8)
+## Gate 2: Code Review (Tuần 3-8)
 
 ### Điều kiện tiên quyết:
-- ✅ **Design đã merge vào master** (SCORE.json tồn tại)
-- ✅ **Đã sync fork** để lấy design + SCORE.json
+- ✅ **Design đã đạt ≥80 điểm** (teacher phê duyệt)
+- ✅ **Code branch tạo TỪ design branch**
 - ✅ **Code xong + test xong** trước khi nộp
 
 ### Khi nộp:
-- **Thời điểm:** Tuần 3-8 (sau khi design pass)
-- **Branch name:** `embedded-linux/K{COURSE}/project/P{N}/{YOUR_USERNAME}/project`
-  - Ví dụ: `embedded-linux/K27.1/project/P1/nguyen-van-a/project`
+- **Thời điểm:** Tuần 3-8 (sau khi design ≥80)
+- **Branch name:** `embedded-linux/K{COURSE}/project/P{N}/{YOUR_USERNAME}/code`
+  - Ví dụ: `embedded-linux/K27.1/project/P1/nguyen-van-a/code`
+  - ⚠️ **Tạo từ design branch:** `git checkout -b .../code origin/embedded-linux/K27.1/project/P1/nguyen-van-a/design`
 
 ### File nộp:
 
@@ -272,7 +262,7 @@ GPIO pin 17 state: 1 (pressed)
    ```bash
    git add embedded-linux/K27.1/nguyen-van-a/project/submission/
    git commit -m "Fix: [specific issue]"
-   git push origin embedded-linux/K27.1/project/P1/nguyen-van-a/project
+   git push origin embedded-linux/K27.1/project/P1/nguyen-van-a/code
    ```
 4. **GitHub tự động:**
    - Update PR
@@ -301,35 +291,38 @@ git config user.email
 
 **Design PR:**
 ```
-embedded-linux/{COURSE}/project/P{N}/{STUDENT}/{design}
+embedded-linux/{COURSE}/project/P{N}/{STUDENT}/design
 ```
 
-**Project PR:**
+**Code PR:**
 ```
-embedded-linux/{COURSE}/project/P{N}/{STUDENT}/{project}
+embedded-linux/{COURSE}/project/P{N}/{STUDENT}/code
 ```
 
-- ❌ Sai: `P1-design`, `nguyen-van-a/P1`, `project/P1`
+- ❌ Sai: `P1-design`, `nguyen-van-a/P1`, `project/P1`, `embedded-linux/.../project` (cũ)
 - ✅ Đúng: `embedded-linux/K27.1/project/P1/nguyen-van-a/design`
+- ✅ Đúng: `embedded-linux/K27.1/project/P1/nguyen-van-a/code`
 
 ### 3️⃣ Một PR Duy Nhất (Không Tạo PR Mới)
 
 - Khi bị **Request changes** → **không close PR cũ + tạo PR mới**
 - **Push commit mới vào CÙNG branch** → GitHub tự động update PR
 
-### 4️⃣ Sync Fork Trước Khi Code
+### 4️⃣ Tạo Code Branch Từ Design Branch
 
 ```bash
-# Sau khi design được merge
+# Fetch latest changes từ remote
 git fetch origin
-git pull origin master
 
-# Kiểm tra SCORE.json có không
-cat embedded-linux/K27.1/nguyen-van-a/project/submission/design/SCORE.json
+# Tạo code branch TỪ design branch
+git checkout -b embedded-linux/K27.1/project/P1/nguyen-van-a/code \
+  origin/embedded-linux/K27.1/project/P1/nguyen-van-a/design
 
-# Rồi tạo branch project
-git checkout -b embedded-linux/K27.1/project/P1/nguyen-van-a/project
+# Kiểm tra DESIGN.md có trong local không
+cat embedded-linux/K27.1/nguyen-van-a/project/submission/design/DESIGN.md
 ```
+
+**⚠️ Quan trọng:** Code branch PHẢI derived từ design branch (để có DESIGN.md context)
 
 ### 5️⃣ Test Kỹ Trước Khi Nộp
 
@@ -337,14 +330,11 @@ git checkout -b embedded-linux/K27.1/project/P1/nguyen-van-a/project
 - Không có bằng chứng test → không thể chấm được
 - test_report.md là **điểm duy nhất** chứng minh code hoạt động
 
-### 6️⃣ Design Có Thể Fix Song Song Với Code
+### 6️⃣ Design Phải ≥80 Trước Khi Code
 
-- Nếu design đạt **60-79** (Pass with revisions) → được merge + code
-- Đồng thời có thể:
-  - Code theo design hiện tại
-  - Fix DESIGN.md trên branch riêng → open new design PR để revise
-  - Teacher sẽ flag "design drift" nếu code không match design cũ
-- **Nhưng:** Design revision phải hoàn thành trước final approval của code
+- Nếu design 60-79 → **chưa được code**, phải sửa cho đến ≥80
+- Teacher phê duyệt design ≥80 → mới được phép tạo code branch
+- **Lợi ích:** Code design không bị drift, DESIGN.md ổn định từ đầu
 
 ---
 
@@ -358,32 +348,28 @@ git checkout -b embedded-linux/K27.1/project/P1/nguyen-van-a/project
 3. Open PR trên GitHub
 4. CI tự động run review_pr.py → Claude review
 5. Xem Claude comment → score + feedback
-6. Nếu score ≥60:
-   a. Teacher approve
-   b. Merge PR → SCORE.json tự động được tạo
-7. Nếu score <60:
+6. Nếu score <80:
    a. Fix DESIGN.md
    b. git add/commit/push (cùng branch)
-   c. PR tự động update
-   d. CI re-run → new score
-   e. Lặp đến khi score ≥60
-8. Sync fork: git pull origin master
-   → SCORE.json sẽ có trong local
+   c. PR tự động update → CI re-run → new score
+   d. Lặp đến khi score ≥80
+7. Nếu score ≥80:
+   a. Teacher phê duyệt
+   b. Có thể bắt đầu code (tạo code branch)
 ```
 
-### Project Gate (Tuần 3-8):
+### Code Gate (Tuần 3-8):
 
 ```
-1. Verify SCORE.json tồn tại ✅
-2. Code theo DESIGN.md
-3. Test toàn bộ M1-M9 (hoặc M1-M11)
-4. Ghi test_report.md chi tiết (log + result cụ thể)
-5. git add/commit/push vào branch: embedded-linux/K27.1/project/P1/nguyen-van-a/project
-6. Open PR trên GitHub
-7. CI tự động check:
-   a. SCORE.json có không? (design merged?)
-   b. test_report.md có không?
-8. Claude review code + design alignment
+1. Design đã ≥80 + teacher phê duyệt ✅
+2. Tạo code branch TỪ design branch:
+   git checkout -b .../code origin/.../design
+3. Code theo DESIGN.md
+4. Test toàn bộ M1-M9 (hoặc M1-M11)
+5. Ghi test_report.md chi tiết (log + result cụ thể)
+6. git add/commit/push vào branch: embedded-linux/K27.1/project/P1/nguyen-van-a/code
+7. Open PR trên GitHub
+8. Claude review code (có DESIGN.md context từ design branch)
 9. Xem Claude comment → score + code quality feedback
 10. Nếu score ≥60 + teacher ok:
     a. Teacher approve
@@ -392,7 +378,7 @@ git checkout -b embedded-linux/K27.1/project/P1/nguyen-van-a/project
     a. Fix code / update test_report.md
     b. Re-test (quan trọng!)
     c. git add/commit/push (cùng branch)
-    d. PR tự động update + CI re-run
+    d. PR tự động update + CI re-run → new score
     e. Lặp đến khi score ≥60 + teacher approve
 ```
 
@@ -403,14 +389,11 @@ git checkout -b embedded-linux/K27.1/project/P1/nguyen-van-a/project
 **Q: Tạo PR từ account khác được không?**
 A: Không. GitHub account phải khớp với class.json → PR bị reject.
 
-**Q: Có thể sửa SCORE.json sau merge không?**
-A: Không. SCORE.json bị lock trong git history (immutable).
+**Q: Design score 70 (Pass with revisions) được code chưa?**
+A: Chưa. Phải đạt ≥80 điểm + teacher phê duyệt mới được code.
 
-**Q: Design score 70 (Pass with revisions) mà không merge được chứ?**
-A: Sai. Score 70 ≥ 60 → được merge. Có thể code song parallel với fix design.
-
-**Q: Code PR được tạo trước design merge được không?**
-A: Không. Hệ thống tự động reject nếu SCORE.json không tồn tại.
+**Q: Code PR được tạo trước design ≥80 được không?**
+A: Không. Phải đợi design ≥80 + teacher approve → code branch derive từ design.
 
 **Q: Tạo PR mới khi bị Request changes được không?**
 A: Không nên. Dùng cùng PR, push commit mới → GitHub tự động update.
@@ -447,9 +430,11 @@ A: Không fix cứng. P1-P4 từ 200-500 dòng (tùy yêu cầu). Focus vào log
 - [ ] Test plan realistic
 - [ ] GitHub account khớp với class.json
 - [ ] Branch name đúng format: `embedded-linux/K{COURSE}/project/P{N}/{STUDENT}/design`
+- [ ] **Score ≥80 + teacher phê duyệt**
 
-### Project Gate:
-- [ ] Design đã merge (SCORE.json ≥60 + approved)
+### Code Gate:
+- [ ] Design đã ≥80 + teacher phê duyệt ✅
+- [ ] Code branch tạo TỪ design branch (có DESIGN.md)
 - [ ] Code hoàn thành + build pass
 - [ ] Test toàn bộ M1-M9 (hoặc M1-M11)
 - [ ] test_report.md chi tiết (log + result cụ thể)
@@ -457,11 +442,12 @@ A: Không fix cứng. P1-P4 từ 200-500 dòng (tùy yêu cầu). Focus vào log
 - [ ] Logs trong test_report.md match code (không bịa)
 - [ ] Edge cases tested
 - [ ] GitHub account khớp
-- [ ] Branch name đúng: `embedded-linux/K{COURSE}/project/P{N}/{STUDENT}/project`
+- [ ] Branch name đúng: `embedded-linux/K{COURSE}/project/P{N}/{STUDENT}/code`
 - [ ] Code match DESIGN.md (không design drift lớn)
 - [ ] Kỹ thuật bắt buộc đúng (epoll, timerfd, hash, /proc parsing, v.v.)
 
 ---
 
-*Last updated: 2026-07-08*
-*Version: 1.0 — Hệ thống DevLinux 2-Gate Review*
+*Last updated: 2026-07-14*
+*Version: 2.0 — Design-Code Separation (No SCORE.json)*
+*Design: review-only, anh quản lý approval. Code: độc lập, từ design branch.*
