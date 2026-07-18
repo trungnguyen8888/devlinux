@@ -1,8 +1,8 @@
 CC := gcc
 CFLAGS := -Wall -Wextra -pedantic -Werror -std=c99
-TARGET := err_decoder
-SRC := main.c err_util.c
-HDR := err_util.h
+TARGET := cmd_dispatcher
+SRC := main.c cmd_dispatcher.c
+HDR := cmd_dispatcher.h
 INC := -I.
 
 .PHONY: all clean run clang_tidy cpp_check

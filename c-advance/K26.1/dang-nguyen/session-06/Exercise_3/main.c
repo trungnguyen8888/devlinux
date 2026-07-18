@@ -1,18 +1,25 @@
 #include <stdint.h>
-#include <stdio.h>
-#include "err_util.h"
+#include "cmd_dispatcher.h"
+
+#define ARRAY_SIZE(a)   (uint32_t)(sizeof(a) / sizeof((a)[0]))
 
 #define APP_SUCCESS     (0)
-#define ARRAY_SIZE(a)   (uint32_t)(sizeof(a) / sizeof((a)[0]))
 
 int32_t main(void)
 {
-    // NOLINTNEXTLINE(readability-magic-numbers)
-    int32_t err_test[] = { 1, 99 };
-
-    for (uint32_t idx = 0U; idx < ARRAY_SIZE(err_test); idx++)
+    static const char *p_cmd_str[] =
     {
-        (void)printf("Error code %d: %s\n", err_test[idx], decode_error(err_test[idx]));
+        "LED_ON",
+        "LED_OFF",
+        "MOTOR_START",
+        "MOTOR_STOP",
+        "STATUS",
+        "DUMMY"
+    };
+
+    for (uint32_t i = 0U; i < ARRAY_SIZE(p_cmd_str); i++)
+    {
+        dispatch_command(p_cmd_str[i]);
     }
 
     return APP_SUCCESS;
